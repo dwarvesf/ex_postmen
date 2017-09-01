@@ -1,6 +1,18 @@
+# Created by https://www.gitignore.io/api/elixir
+
+### macOS ###
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+### Elixir ###
 /_build
 /cover
 /deps
 erl_crash.dump
 *.ez
 *.beam
+
+### Elixir Patch ###
+/doc
+# End of https://www.gitignore.io/api/elixir
