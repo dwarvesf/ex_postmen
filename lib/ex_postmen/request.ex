@@ -4,7 +4,9 @@ defmodule ExPostmen.Request do
       headers: [],
       http_method: nil,
       params: nil,
-      path: nil
+      path: nil,
+      retry_count: 0,
+      retry: false,
     ]
   
     @api_base "https://api.easypost.com/v2"
@@ -60,16 +62,17 @@ defmodule ExPostmen.Request do
       request(request.http_method, url, request.params, request.headers, api_key)
     end
   
-    defp parse({:error, result}), do: {:error, result}
-    defp parse({:ok, %{body: ""}}), do: %{}
-    defp parse({:ok, %{body: body}}), do: Poison.decode!(body)
-  
+    defp parse(response), do: ExPostmen.Response.parse(response)
+    
     defp request(http_method, url, params, headers, api_key) do
       all_headers = build_headers(headers, api_key)
-      data = if is_nil(params), do: "", else: Poison.encode!(params)
+
+      url = if http_method == :get, do: url <> "?" <> URI.encode_query(params), else: url
+
+      data = if http_method == :get, do: "", else: Poison.encode!(params)
   
       response = HTTPoison.request(http_method, url, data, all_headers, @http_opts)
-      ExPostmen.Response.parse(response)
+      
     end
   
     defp build_headers(headers, api_key) do
@@ -77,6 +80,7 @@ defmodule ExPostmen.Request do
         {"content-type", "application/json"},
         {"postmen-api-key", "#{api_key}"},
         {"User-Agent", "ExPostmen/v3 ElixirClient1.0"},
+        {"Connection", "keep-alive"},
       ]
     end
   end
