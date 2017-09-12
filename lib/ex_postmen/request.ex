@@ -10,9 +10,6 @@ defmodule ExPostmen.Request do
     ]
   
     @api_base "https://api.easypost.com/v2"
-    @http_opts []
-    @open_timeout 30
-    @timeout 60
     
     # Main domain used during normal usage.
     @main_domain "postmen.com"
@@ -64,14 +61,16 @@ defmodule ExPostmen.Request do
   
     defp parse(response), do: ExPostmen.Response.parse(response)
     
-    defp request(http_method, url, params, headers, api_key) do
+    defp request(http_method, url, params, headers, config) do
+      api_key = config.api_key
+      options = [recv_timeout: config.timeout]
       all_headers = build_headers(headers, api_key)
 
       url = if http_method == :get, do: url <> "?" <> URI.encode_query(params), else: url
 
       data = if http_method == :get, do: "", else: Poison.encode!(params)
   
-      response = HTTPoison.request(http_method, url, data, all_headers, @http_opts)
+      response = HTTPoison.request(http_method, url, data, all_headers, options)
       
     end
   
