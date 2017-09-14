@@ -53,17 +53,19 @@ defmodule ExPostmen.Request do
     end
   
     defp request(request, config) do
-      api_key = config.api_key
       url = build_url(request, config)
   
-      request(request.http_method, url, request.params, request.headers, api_key)
+      request(request.http_method, url, request.params, request.headers, config)
     end
   
     defp parse(response), do: ExPostmen.Response.parse(response)
     
     defp request(http_method, url, params, headers, config) do
       api_key = config.api_key
-      options = [recv_timeout: config.timeout]
+      options = [
+        {:timeout, config.timeout},
+        {:recv_timeout, config.timeout}
+      ]
       all_headers = build_headers(headers, api_key)
 
       url = if http_method == :get, do: url <> "?" <> URI.encode_query(params), else: url

@@ -21,14 +21,14 @@ defmodule ExPostmen.Resource do
 
       if :find in import_functions do
         @spec find(binary, map) :: ExPostmen.Request.t
-        def find(id, params \\ nil) do
+        def find(id, params \\ %{}) do
           request(:get, find_url(id), params)
         end
       end
 
       if :list in import_functions do
         @spec list(map) :: ExPostmen.Request.t
-        def list(params \\ nil) do
+        def list(params \\ %{}) do
           request(:get, list_url(), params)
         end
       end
